@@ -1,5 +1,3 @@
-// Refactored from https://github.com/Azure-Samples/ms-identity-javascript-react-tutorial/blob/main/1-Authentication/1-sign-in/SPA/src/authConfig.js
-
 import { IPublicClientApplication } from "@azure/msal-browser";
 
 const appServicesAuthTokenUrl = ".auth/me";
@@ -248,5 +246,19 @@ export const getTokenClaims = async (client: IPublicClientApplication): Promise<
         return appServicesToken.user_claims;
     }
 
+    return undefined;
+};
+
+/**
+ * Retrieves the xms_pl value from the token claims of the active account.
+ * If no active account is found, attempts to retrieve the xms_pl value from the app services login token if available.
+ * @param {IPublicClientApplication} client - The MSAL public client application instance.
+ * @returns {Promise<string | undefined>} A promise that resolves to the xms_pl value of the active account, the xms_pl value from the app services login token, or undefined if no xms_pl value is found.
+ */
+export const getXmsPlValue = async (client: IPublicClientApplication): Promise<string | undefined> => {
+    const tokenClaims = await getTokenClaims(client);
+    if (tokenClaims && tokenClaims["xms_pl"]) {
+        return tokenClaims["xms_pl"] as string;
+    }
     return undefined;
 };

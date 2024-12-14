@@ -22,10 +22,15 @@ export const TokenClaimsDisplay = () => {
     const { instance } = useMsal();
     const activeAccount = instance.getActiveAccount();
     const [claims, setClaims] = useState<Record<string, unknown> | undefined>(undefined);
+    const [xmsPlValue, setXmsPlValue] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const fetchClaims = async () => {
-            setClaims(await getTokenClaims(instance));
+            const tokenClaims = await getTokenClaims(instance);
+            setClaims(tokenClaims);
+            if (tokenClaims && tokenClaims["xms_pl"]) {
+                setXmsPlValue(tokenClaims["xms_pl"] as string);
+            }
         };
 
         fetchClaims();
@@ -93,6 +98,7 @@ export const TokenClaimsDisplay = () => {
                     {({ item, rowId }) => <DataGridRow<Claim> key={rowId}>{({ renderCell }) => <DataGridCell>{renderCell(item)}</DataGridCell>}</DataGridRow>}
                 </DataGridBody>
             </DataGrid>
+            {xmsPlValue && <div>Preferred Language: {xmsPlValue}</div>}
         </div>
     );
 };

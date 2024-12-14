@@ -1,5 +1,5 @@
 import { AccountInfo, EventType, PublicClientApplication } from "@azure/msal-browser";
-import { checkLoggedIn, msalConfig, useLogin } from "./authConfig";
+import { checkLoggedIn, msalConfig, useLogin, getXmsPlValue } from "./authConfig";
 import { useEffect, useState } from "react";
 import { MsalProvider } from "@azure/msal-react";
 import { LoginContext } from "./loginContext";
@@ -7,6 +7,8 @@ import Layout from "./pages/layout/Layout";
 
 const LayoutWrapper = () => {
     const [loggedIn, setLoggedIn] = useState(false);
+    const [xmsPlValue, setXmsPlValue] = useState<string | undefined>(undefined);
+
     if (useLogin) {
         var msalInstance = new PublicClientApplication(msalConfig);
 
@@ -27,6 +29,7 @@ const LayoutWrapper = () => {
         useEffect(() => {
             const fetchLoggedIn = async () => {
                 setLoggedIn(await checkLoggedIn(msalInstance));
+                setXmsPlValue(await getXmsPlValue(msalInstance));
             };
 
             fetchLoggedIn();
@@ -40,7 +43,10 @@ const LayoutWrapper = () => {
                         setLoggedIn
                     }}
                 >
-                    <Layout />
+                    <div>
+                        <Layout />
+                        {xmsPlValue && <div>Preferred Language: {xmsPlValue}</div>}
+                    </div>
                 </LoginContext.Provider>
             </MsalProvider>
         );
